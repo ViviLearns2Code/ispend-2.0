@@ -3,15 +3,14 @@
   <b-navbar toggleable="lg" type="dark" variant="info">
     <b-navbar-nav>
       <b-nav-item to="/">Home</b-nav-item>
-      <b-nav-item to="/manage">Manage</b-nav-item>
-      <b-nav-item to="/new">New</b-nav-item>
-      <b-nav-item to="/dashboard">Dashboard</b-nav-item>
+      <b-nav-item :disabled="!isLoggedIn" to="/manage">Manage</b-nav-item>
+      <b-nav-item :disabled="!isLoggedIn" to="/new">New</b-nav-item>
+      <b-nav-item :disabled="!isLoggedIn" to="/dashboard">Dashboard</b-nav-item>
     </b-navbar-nav>
     <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
-      <b-button variant="danger">Login</b-button>
-      <b-button variant="success">Logout</b-button>
-      <div id="g-signin2-btn" class="g-signin2" data-onsuccess="onSignIn">Sign in</div>
+      <b-button ref="login-btn" v-show="!isLoggedIn" variant="success">Login</b-button>
+      <b-button ref="logout-btn" v-show="isLoggedIn" variant="danger" v-on:click="onSignOut">Logout</b-button>
     </b-navbar-nav>
   </b-navbar>
   <router-view></router-view>
@@ -19,35 +18,64 @@
 </template>
 
 <script>
-import { BNavbar } from 'bootstrap-vue'
-import { BButton } from 'bootstrap-vue'
+import { BNavbar } from 'bootstrap-vue';
+import { BButton } from 'bootstrap-vue';
+import axios from "axios";
+
 export default {
   components: {
     "b-navbar": BNavbar,
     "b-button": BButton
   },
+  data(){
+    return {
+      isLoggedIn: false
+    }
+  },
   methods: {
-    isLoggedIn() {
-        return false;
+    onSignIn(googleUser){
+      const id_token = googleUser.getAuthResponse().id_token;
+      var vm = this
+      console.debug(id_token)
+      //send id_token to backend API for verification
+      const request_data = {
+        "google_id_token": id_token
+      };
+      const request_config = {
+        withCredentials: true
+      };
+      axios.post("http://localhost:8000/login", request_data, request_config).then((resp)=>{
+        vm.isLoggedIn = true;
+      }, (err)=>{
+        console.log(err)
+      })
+    },
+    onSignOut(){
+      var vm = this
+      //const auth2 = window.gapi.auth2.getAuthInstance()
+      axios.get("http://localhost:8000/logout").then((resp)=>{
+        vm.isLoggedIn = false;
+        this.$router.push("/");
+      });
+    },
+    attachSignin(element) {
+      const auth2 = window.gapi.auth2.getAuthInstance();
+      auth2.attachClickHandler(element, {}, this.onSignIn, (error)=>{
+            console.error(JSON.stringify(error, undefined, 2));
+          });
     }
   },
   mounted() {
+    var vm = this;
     window.gapi.load("auth2", () => {
       /* Ready. Make a call to gapi.auth2.init or some other API */
-      const auth2 = window.gapi.auth2.init({
+      const _auth2 = window.gapi.auth2.init({
         client_id: "628335156384-f2nn9sjonhucddp7jmnhc7gl16fehec9.apps.googleusercontent.com",
+        scope: "openid"
       });
-      auth2.then((resp)=>{
-        console.log("Initialization successful: "+resp);
-      }, (resp) => {
-        console.log("Could not initialize: "+resp);
-      })
-      window.gapi.signin2.render('g-signin2-btn', { 
-        onsuccess: this.onSignIn
-      })
+      vm.attachSignin(vm.$refs["login-btn"]);
     });
   }
-
 }
 </script>
 <style>

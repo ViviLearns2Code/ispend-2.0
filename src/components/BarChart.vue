@@ -21,14 +21,14 @@ export default {
     data: Array
   },
   mounted() {
-    let width=this.width;
-    let height=this.height;
-    let color=this.color;
-    let padLeft=this.padLeft;
-    let padBottom=this.padBottom;
-    let padTop=this.padTop;
-    let padRight=this.padRight;
-    let data=this.data;
+    var width=this.width;
+    var height=this.height;
+    var color=this.color;
+    var padLeft=this.padLeft;
+    var padBottom=this.padBottom;
+    var padTop=this.padTop;
+    var padRight=this.padRight;
+    var data=this.data;
     this.setLayout(width, height, color, padLeft, padBottom, padTop, padRight)
     this.createBarchart(data);
   },
@@ -59,30 +59,30 @@ export default {
       }
     },
     createBarchart(data){
-      let self = this;
-      let d3Svg = this.d3Svg = d3.select("#svg-barchart");
-      let gGraph = d3Svg.append("g").attr("class", "graph");
-      let gBar = gGraph.append("g")
+      var self = this;
+      var d3Svg = this.d3Svg = d3.select("#svg-barchart");
+      var gGraph = d3Svg.append("g").attr("class", "graph");
+      var gBar = gGraph.append("g")
         .attr("class", "barchart");
-      let gAxisX = gGraph.append("g")
+      var gAxisX = gGraph.append("g")
         .attr("class", "x-axis");
-      let gAxisY = gGraph.append("g")
+      var gAxisY = gGraph.append("g")
         .attr("class", "y-axis");
 
-      let xScale = this.xScale = d3.scaleLinear()
+      var xScale = this.xScale = d3.scaleLinear()
         .domain([0, d3.max(data, (d)=>{
           return d.val;
         })])
         .range([0, self.width - self.padLeft - self.padRight]);
-      let yScale = this.yScale = d3.scaleBand()
+      var yScale = this.yScale = d3.scaleBand()
         .domain(data.map((d)=>{
           return d.text;
         }))
         .rangeRound([0, self.height - self.padBottom - self.padTop])
         .padding(0.1);
-      let xAxis = this.xAxis = d3.axisBottom(xScale);
-      let yAxis = this.yAxis = d3.axisLeft(yScale);
-      let transform = 
+      var xAxis = this.xAxis = d3.axisBottom(xScale);
+      var yAxis = this.yAxis = d3.axisLeft(yScale);
+      var transform =
       `translate(${this.padLeft},${this.height-this.padBottom})`;
       gAxisX.call(xAxis)
         .attr("transform",transform);
@@ -90,7 +90,7 @@ export default {
       gAxisY.call(yAxis)
         .attr("transform", transform);
 
-      let _bars = gBar
+      var _bars = gBar
         .selectAll(".bar")
         .data(data)
         .enter()
@@ -115,18 +115,18 @@ export default {
         });
     },
     updateBarchart(data){
-      let d3 = this.d3;
-      let self = this;
-      let d3Svg = this.d3Svg;
+      var d3 = this.d3;
+      var self = this;
+      var d3Svg = this.d3Svg;
       if (!d3Svg || d3Svg.select(".graph").empty()){
         this.createBarchart(data);
         return;
       }
       // update scales, axis, bar
-      let xAxis = this.xAxis;
-      let yAxis = this.yAxis;
-      let xScale = this.xScale;
-      let yScale = this.yScale;
+      var xAxis = this.xAxis;
+      var yAxis = this.yAxis;
+      var xScale = this.xScale;
+      var yScale = this.yScale;
 
       xScale.domain([0, d3.max(data, (d)=>{
         return d.val;
@@ -135,13 +135,13 @@ export default {
           return d.text;
         })
       );
-      let gAxisX = d3Svg.select(".x-axis");
-      let gAxisY = d3Svg.select(".y-axis");
+      var gAxisX = d3Svg.select(".x-axis");
+      var gAxisY = d3Svg.select(".y-axis");
 
-      let t = d3Svg.transition().duration(750);
+      var t = d3Svg.transition().duration(750);
       gAxisX.transition(t).call(xAxis);
       gAxisY.transition(t).call(yAxis);
-      let selection = d3Svg.select("g.barchart")
+      var selection = d3Svg.select("g.barchart")
         .selectAll(".bar")
         .data(data);
       selection.transition(t)

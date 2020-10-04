@@ -21,14 +21,14 @@ export default {
     data: Array
   },
   mounted() {
-    let width=this.width;
-    let height=this.height;
-    let colorDomain=this.colorDomain;
-    let padLeft=this.padLeft;
-    let padBottom=this.padBottom;
-    let padTop=this.padTop;
-    let padRight=this.padRight;
-    let data=this.data;
+    var width=this.width;
+    var height=this.height;
+    var colorDomain=this.colorDomain;
+    var padLeft=this.padLeft;
+    var padBottom=this.padBottom;
+    var padTop=this.padTop;
+    var padRight=this.padRight;
+    var data=this.data;
     this.setLayout(width, height, colorDomain, padLeft, padBottom, padTop, padRight);
     this.createTimeseriesChart(data);
   },
@@ -54,97 +54,106 @@ export default {
       this.title = title;
     },
     selectMonth(data){
-      // fire event in case other components subscribed
-      this.timeseriesBroadcaster.fireSelectMonth(data);
+      // fire event to parent so other components can update
+      console.log(data)
+      this.$emit("onMonthSelect", data);
+    },
+    clear(){
+      d3.selectAll("#svg-timeseries > *").remove()
     },
     createTimeseriesChart(data){
-      let self = this;
+      var self = this;
       self.colors = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(self.colorDomain);
-      let d3Svg = self.d3Svg = d3.select("#svg-timeseries");
+      var d3Svg = self.d3Svg = d3.select("#svg-timeseries");
 
       // tooltip div
-      /*let _div = d3.select(self.parentNativeElement)
+      /*var _div = d3.select(self.parentNativeElement)
         .append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);*/
 
-      let gAxisX = d3Svg.append("g")
+      var gAxisX = d3Svg.append("g")
         .attr("class", "x-axis");
-      let gAxisY = d3Svg.append("g");
-      let gLines = d3Svg.append("g")
+      var gAxisY = d3Svg.append("g");
+      var gLines = d3Svg.append("g")
         .attr("class", "timeseries");
 
-      let xScale = this.xScale = d3.scaleTime();
-      let minX = d3.min(data, (d)=>{
+      var xScale = this.xScale = d3.scaleTime();
+      var minX = d3.min(data, (d)=>{
           return d3.min(d.data, (cd)=>{
             return cd.x;
           }
         );
       });
-      let maxX = d3.max(data, (d)=>{
+      var maxX = d3.max(data, (d)=>{
         return d3.max(d.data, (cd)=>{
           return cd.x;
         });
-      });   
-      let minY = d3.min(data, (d)=>{
+      });
+      var minY = d3.min(data, (d)=>{
         return d3.min(d.data, (cd)=>{
           return cd.y;
         });
       });
-      let maxY = d3.max(data, (d)=>{
+      var maxY = d3.max(data, (d)=>{
         return d3.max(d.data, (cd)=>{
           return cd.y;
         });
-      }); 
+      });
       xScale
         .domain([minX, maxX])
         .range([self.padLeft, self.width - self.padLeft - self.padRight]);
 
-      let xAxis = this.xAxis = d3.axisBottom(xScale)
+      var xAxis = this.xAxis = d3.axisBottom(xScale)
         .tickFormat(d3.timeFormat("%b-%y"))
         .ticks(12);
-      
-      let yScale = this.yScale = d3.scaleLinear();
+
+      var yScale = this.yScale = d3.scaleLinear();
       yScale
         .domain([maxY, minY])
         .range([self.padTop, self.height - self.padTop - self.padBottom]);
-      let yAxis = this.yAxis = d3.axisLeft(yScale);
+      var yAxis = this.yAxis = d3.axisLeft(yScale);
 
-      let transformX = 
+      var transformX =
       `translate(0,${this.height-this.padBottom})`;
       gAxisX.call(xAxis)
         .attr("transform",transformX);
       d3Svg.selectAll(".x-axis .tick")
         .on("click", function(d) {
           self.selectMonth(d);
-        }); 
+        });
+      d3Svg.selectAll(".x-axis .tick text")
+          .attr("y", 0)
+          .attr("x", 9)
+          .attr("transform", "rotate(90)")
+          .style("text-anchor", "start");
 
-      let transformY = `translate(${self.padLeft},${self.padTop})`;
+      var transformY = `translate(${self.padLeft},${self.padTop})`;
       gAxisY.call(yAxis)
         .attr("transform",transformY);
-      let lines = gLines.selectAll(".lines")
+      var lines = gLines.selectAll(".lines")
         .data(data)
         .enter()
         .append("g")
         .attr("class", "lines");
-      let lineGenerator = d3.line()
+      var lineGenerator = d3.line()
         .x((d)=>{
           return xScale(d.x);
         })
         .y((d)=>{
           return yScale(d.y);
         });
-      let dataPointCollection = [];
+      var dataPointCollection = [];
       data.forEach((d,i)=>{
-        let catName = d.text;
+        var catName = d.text;
         lines.append("path")
         .datum(d.data)
         .attr("d", lineGenerator)
         .attr("stroke", self.colors(d.text))
         .attr("fill", "none");
         dataPointCollection = dataPointCollection.concat(d.data);
-        let circles = lines.selectAll(".circle")
+        var circles = lines.selectAll(".circle")
           .data(dataPointCollection)
           .enter()
           .append("circle")
