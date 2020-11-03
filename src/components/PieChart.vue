@@ -1,6 +1,7 @@
 <template>
   <div class="piechart">
     <h1>{{ title }}</h1>
+    <p v-if="datapoints.length==0">{{ placeholder }}</p>
     <svg id="svg-piechart" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
   </div>
 </template>
@@ -12,26 +13,31 @@ export default {
   name: "Piechart",
   props: {
     title: String,
-    colorDomain: Array,
+    datapoints: Array,
+    midPointX: Number,
+    midPointY: Number,
+    outerRadius: Number,
+    innerRadius: Number,
     width: Number,
     height: Number,
-    padLeft: Number,
-    padBottom: Number,
-    padTop: Number,
-    padRight: Number,
-    data: Array
+    padding: Number,
+    colorDomain: Array,
+  },
+  data: function (){
+    return {
+      placeholder: "No data available"
+    }
   },
   mounted(){
     var width=this.width;
     var height=this.height;
+    var padding=this.padding;
+    var outerRadius=this.outerRadius;
+    var innerRadius=this.innerRadius;
     var colorDomain=this.colorDomain;
-    var padLeft=this.padLeft;
-    var padBottom=this.padBottom;
-    var padTop=this.padTop;
-    var padRight=this.padRight;
-    var data=this.data;
-    this.setLayout(width, height, colorDomain, padLeft, padBottom, padTop, padRight);
-    this.createPieChart(data);
+    this.setLayout(width, height, outerRadius, innerRadius, padding, colorDomain);
+    var datapoints=this.datapoints;
+    this.createPieChart(datapoints);
   },
   methods: {
     clear(){
@@ -40,26 +46,24 @@ export default {
     setLayout(
       width,
       height,
-      color,
-      padLeft,
-      padBottom,
-      padTop,
-      padRight
+      outerRadius,
+      innerRadius,
+      padding,
+      colorDomain
       ) {
       this.width = width;
       this.height = height;
-      this.color = color;
-      this.padLeft = padLeft;
-      this.padBottom = padBottom;
-      this.padTop = padTop;
-      this.padRight = padRight;
+      this.outerRadius = outerRadius;
+      this.innerRadius = innerRadius;
+      this.padding = padding;
+      this.colorDomain = colorDomain;
     },
     setTitle(title){
       this.title = title;
     },
-    selectSlice(data, index){
-      // fire event in case other components subscribed
-      this.pieBroadcaster.fireSelectSlice(data);
+    selectSlice(data){
+      // fire event to parent so other components can update
+      this.$emit("sliceselect", data);
     },
     calcLine(pieArcDatum, arcGenerator, radius){
       // calculate the label line for a pie slice
@@ -151,16 +155,17 @@ export default {
       }
     },
     createPieChart(data){
-      // ease of notation
       var self = this;
+      if(data.length == 0){
+        return;
+      }
       self.colors = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(self.colorDomain);
       var radius = this.outerRadius - this.innerRadius;
       this.midpointX = this.padding + (this.width-2*this.padding) / 2;
       this.midpointY = this.padding + (this.height - 2*this.padding) / 2;
       // svg tag
-      var d3Svg = d3.select("#svg-piechart")
-        .select("svg");
+      var d3Svg = d3.select("#svg-piechart");
 
       self.pieGenerator = d3.pie()
         .value(function(d){ return d.val; });
@@ -199,15 +204,15 @@ export default {
           this["_current"] = b; // instead of this._current tp prevent typescript error
         })
         .attr("d", self.arcGenerator)
-        .on("click", function(d,i){
-          self.selectSlice(d.data,i);
+        .on("click", function(_d,i){
+          self.selectSlice(i.data);
         })
         .transition()
           .duration(750)
           .attrTween("d", (d)=>{
             const {_data, _value, _index, ...dReduced} = d;
             var b = {...dReduced, innerRadius: self.innerRadius, outerRadius: self.outerRadius};
-            var i = this.d3.interpolate({startAngle: 0, endAngle: 0}, b);
+            var i = d3.interpolate({startAngle: 0, endAngle: 0}, b);
             return function(t) {
               return d3.arc()(i(t));
             };
@@ -252,7 +257,6 @@ export default {
         });
     },
     updatePie(data){
-      var d3 = this.d3;
       var self = this;
       var d3Svg = this.d3Svg;
       var radius = this.outerRadius - this.innerRadius;
@@ -358,8 +362,8 @@ export default {
           var b = {...dReduced, innerRadius: self.innerRadius, outerRadius: self.outerRadius};
           this["_current"] = self.findNeighborArc(i, dataOld, dataNew, self.key) || b;
         })
-        .on("click", function(d,i){
-          self.selectSlice(d.data,i);
+        .on("click", function(_d,i){
+          self.selectSlice(i.data);
         })
         .transition()
           .duration(750)

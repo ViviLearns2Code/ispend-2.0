@@ -1,6 +1,7 @@
 <template>
   <div class="barchart">
     <h1>{{ title }}</h1>
+    <p v-if="datapoints.length==0">{{ placeholder }}</p>
     <svg id="svg-barchart" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
   </div>
 </template>
@@ -18,7 +19,12 @@ export default {
     padBottom: Number,
     padTop: Number,
     padRight: Number,
-    data: Array
+    datapoints: Array
+  },
+  data: function (){
+    return {
+      placeholder: "No data available"
+    }
   },
   mounted() {
     var width=this.width;
@@ -28,9 +34,9 @@ export default {
     var padBottom=this.padBottom;
     var padTop=this.padTop;
     var padRight=this.padRight;
-    var data=this.data;
+    var datapoints=this.datapoints;
     this.setLayout(width, height, color, padLeft, padBottom, padTop, padRight)
-    this.createBarchart(data);
+    this.createBarchart(datapoints);
   },
   methods: {
     setLayout(
@@ -53,13 +59,14 @@ export default {
     setTitle(title){
       this.title = title;
     },
-    removeBarChart(){
-      if(this.d3Svg){
-        this.d3Svg.selectAll(".graph").remove();
-      }
+    clear(){
+      d3.selectAll(".graph").remove();
     },
     createBarchart(data){
       var self = this;
+      if(data.length == 0){
+        return;
+      }
       var d3Svg = this.d3Svg = d3.select("#svg-barchart");
       var gGraph = d3Svg.append("g").attr("class", "graph");
       var gBar = gGraph.append("g")

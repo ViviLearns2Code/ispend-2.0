@@ -1,6 +1,7 @@
 <template>
   <div class="timeseries">
     <h1>{{ title }}</h1>
+    <p v-if="datapoints.length==0">{{ placeholder }}</p>
     <svg id="svg-timeseries" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet"></svg>
   </div>
 </template>
@@ -18,7 +19,12 @@ export default {
     padBottom: Number,
     padTop: Number,
     padRight: Number,
-    data: Array
+    datapoints: Array
+  },
+  data: function (){
+    return {
+      placeholder: "No data available"
+    }
   },
   mounted() {
     var width=this.width;
@@ -28,9 +34,9 @@ export default {
     var padBottom=this.padBottom;
     var padTop=this.padTop;
     var padRight=this.padRight;
-    var data=this.data;
+    var datapoints=this.datapoints;
     this.setLayout(width, height, colorDomain, padLeft, padBottom, padTop, padRight);
-    this.createTimeseriesChart(data);
+    this.createTimeseriesChart(datapoints);
   },
   methods: {
     setLayout(
@@ -55,14 +61,16 @@ export default {
     },
     selectMonth(data){
       // fire event to parent so other components can update
-      console.log(data)
-      this.$emit("onMonthSelect", data);
+      this.$emit("monthselect", data);
     },
     clear(){
       d3.selectAll("#svg-timeseries > *").remove()
     },
     createTimeseriesChart(data){
       var self = this;
+      if(data.length == 0){
+        return;
+      }
       self.colors = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(self.colorDomain);
       var d3Svg = self.d3Svg = d3.select("#svg-timeseries");
@@ -121,7 +129,7 @@ export default {
         .attr("transform",transformX);
       d3Svg.selectAll(".x-axis .tick")
         .on("click", function(d) {
-          self.selectMonth(d);
+          self.selectMonth(d.explicitOriginalTarget.__data__);
         });
       d3Svg.selectAll(".x-axis .tick text")
           .attr("y", 0)
