@@ -4,7 +4,7 @@
     <b-list-group>
       <b-list-group-item href="#" class="flex-column align-items-start" v-for="e in expenses" :key="e._id">
         <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{e.sum}}</h5>
+          <h5 class="mb-1">{{e.sum | currency_formatter}}</h5>
           <p class="mb-1">
           {{e.category}}
           </p>
@@ -27,6 +27,11 @@ export default {
   data() {
     return {
       expenses: []
+    }
+  },
+  filters: {
+    currency_formatter: function(value){
+      return value.toLocaleString('de-DE', {style: 'currency', currency: 'EUR'});
     }
   },
   methods: {

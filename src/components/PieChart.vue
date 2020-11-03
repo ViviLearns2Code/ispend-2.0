@@ -198,10 +198,9 @@ export default {
           return self.colors(d.data.text);
         })
         .each(function(d, i){
-          // arrow function causes typescript to scope "this" to component instead of d3 object
           const {_data, _value, _index, ...dReduced} = d;
           var b = {...dReduced, innerRadius: self.innerRadius, outerRadius: self.outerRadius};
-          this["_current"] = b; // instead of this._current tp prevent typescript error
+          this["_current"] = b;
         })
         .attr("d", self.arcGenerator)
         .on("click", function(_d,i){
@@ -417,3 +416,18 @@ export default {
   }
 }
 </script>
+<style scoped>
+svg{
+	display: block;
+	margin: auto;
+}
+svg >>> path.arc:hover{
+	cursor: pointer;
+	opacity: .75;
+}
+svg >>> path.label-line{
+	fill: none;
+	stroke: black;
+    stroke-width: 1;
+}
+</style>

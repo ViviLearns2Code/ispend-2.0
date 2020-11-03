@@ -1,18 +1,19 @@
 <template>
   <div class="home">
-    <img alt="ispend" src="../assets/money.jpg">
+    <b-img :src="require('../assets/money.jpg')" alt="ispend" thumbnail fluid></b-img>
     <HelloWorld msg="Welcome to Your Vue.js App"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import HelloWorld from '@/components/HelloWorld.vue';
+import { BImg } from 'bootstrap-vue';
 export default {
-  name: 'Home',
+  name: "Home",
   components: {
-    HelloWorld
+    HelloWorld,
+    "b-img": BImg
   }
 }
 </script>

@@ -76,10 +76,10 @@ export default {
       var d3Svg = self.d3Svg = d3.select("#svg-timeseries");
 
       // tooltip div
-      /*var _div = d3.select(self.parentNativeElement)
+      var _div = d3Svg
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0);*/
+        .style("opacity", 0);
 
       var gAxisX = d3Svg.append("g")
         .attr("class", "x-axis");
@@ -129,7 +129,7 @@ export default {
         .attr("transform",transformX);
       d3Svg.selectAll(".x-axis .tick")
         .on("click", function(d) {
-          self.selectMonth(d.explicitOriginalTarget.__data__);
+          self.selectMonth(d.srcElement.__data__);
         });
       d3Svg.selectAll(".x-axis .tick text")
           .attr("y", 0)
@@ -186,3 +186,25 @@ export default {
   }
 }
 </script>
+<style scoped>
+svg >>> .x-axis .tick text:hover{
+  cursor: pointer;
+  font-weight: 900;
+  fill: rgb(77, 73, 73);
+}
+svg >>> .tooltip {
+  position: absolute;
+  text-align: center;
+  width: 100px;
+  padding: 5px;
+  font: 16px sans-serif;
+  background: lightsteelblue;
+  border: 0px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+svg >>> .circle:hover{
+  opacity: 0.6;
+  cursor: pointer;
+}
+</style>

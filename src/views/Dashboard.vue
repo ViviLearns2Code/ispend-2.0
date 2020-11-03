@@ -70,23 +70,9 @@ export default {
   data() {
     return {
       colorDomain: ["Hobbies", "Home", "Car", "Insurance", "Food", "Career"],
-      timeseriesData: [],/*[{
-          text: "hihi",
-          data: [{x: new Date(2020,2,1), y: 1},{x: new Date(2020,3,1), y: 1}]
-        },{
-          text: "haha",
-          data: [{x: new Date(2020,2,1), y: 2}, {x: new Date(2020,3,1), y: 1}]
-      }],*/
+      timeseriesData: [],
       pieChartData: [],
-      barChartData: []/*[{
-        text: "a",
-        val: 1,
-        data: "jjj"
-      },{
-        text: "b",
-        val: 2,
-        data: "jjj"
-      }]*/
+      barChartData: []
     }
   },
   methods: {
@@ -114,10 +100,7 @@ export default {
       })
       axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
         vm.pieChartData = mapper.conv2Pie(resp.data);
-        if(vm.pieChartData.length > 0){
-          vm.$refs.piechart.clear();
-          vm.$refs.piechart.createPieChart(vm.pieChartData);
-        }
+        vm.$refs.piechart.createPieChart(vm.pieChartData);
       })
     },
     onMonthSelect(data) {

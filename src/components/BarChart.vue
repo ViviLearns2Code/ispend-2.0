@@ -186,3 +186,11 @@ export default {
   }
 }
 </script>
+<style scoped>
+/* deep selector, otherwise scoped style does not work for dynamically created content */
+/* https://github.com/vuejs/vue-loader/issues/559 */
+svg >>> .bar:hover{
+	cursor: pointer;
+	opacity: .5;
+}
+</style>

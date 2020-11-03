@@ -2,7 +2,7 @@
   <div class="manage">
     <h1>Create new expense</h1>
     <b-form @submit="onSubmit" @reset="onReset" v-if="show">
-      <b-form-group id="title-group" label="title:" label-for="title-input" description="title of expense">
+      <b-form-group id="title-group" label="Title" label-for="title-input">
         <b-form-input
           id="title-input"
           v-model="form.title"
@@ -12,10 +12,10 @@
         ></b-form-input>
       </b-form-group>
 
-      <b-form-group id="date-group" label="date:" label-for="datepicker">
+      <b-form-group id="date-group" label="Date" label-for="datepicker">
         <b-form-datepicker id="datepicker" v-model="form.date" class="mb-2"></b-form-datepicker>
       </b-form-group>
-      <b-form-group id="category-group" label="Category:" label-for="category-input">
+      <b-form-group id="category-group" label="Category" label-for="category-input">
         <b-form-select
           id="category-input"
           v-model="form.category"
@@ -24,12 +24,15 @@
         ></b-form-select>
       </b-form-group>
 
-      <b-form-group id="sum-group">
+      <b-form-group id="sum-group"
+        label="Sum"
+        label-for="sum-input"
+        description="in EUR">
         <b-form-input
           id="sum-input"
           v-model="form.sum"
           required
-          placeholder=0
+          placeholder="0.00"
         ></b-form-input>
       </b-form-group>
 
