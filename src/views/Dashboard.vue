@@ -69,6 +69,7 @@ export default {
   },
   data() {
     return {
+      isLoading: false,
       colorDomain: ["Hobbies", "Home", "Car", "Insurance", "Food", "Career"],
       timeseriesData: [],
       pieChartData: [],
@@ -78,6 +79,7 @@ export default {
   methods: {
     load_history(){
       var vm = this;
+      vm.isLoading = true;
       var now = new Date().toISOString();
       const request_hist = {
         params: {
@@ -97,14 +99,33 @@ export default {
         vm.timeseriesData = mapper.conv2Lines(resp.data);
         vm.$refs.timeseries.clear();
         vm.$refs.timeseries.createTimeseriesChart(vm.timeseriesData);
+        vm.isLoading = false
+      }, (err)=>{
+        vm.isLoading = false;
+        vm.$bvToast.toast("Failed to retrieve data", {
+          title: "Error",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       })
       axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
         vm.pieChartData = mapper.conv2Pie(resp.data);
         vm.$refs.piechart.createPieChart(vm.pieChartData);
+        vm.isLoading = false;
+      }, (err)=>{
+        vm.isLoading = false;
+        vm.$bvToast.toast("Failed to retrieve data", {
+          title: "Error",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       })
     },
     onMonthSelect(data) {
       var vm = this;
+      vm.isLoading = true;
       vm.$router.push("#drilldown").catch(err => {})
       const request_monthstats = {
         params: {
@@ -117,6 +138,15 @@ export default {
         vm.pieChartData = mapper.conv2Pie(resp.data);
         vm.$refs.piechart.clear();
         vm.$refs.piechart.createPieChart(vm.pieChartData);
+        vm.isLoading = false;
+      }, (err)=>{
+        vm.isLoading = false;
+        vm.$bvToast.toast("Failed to retrieve data", {
+          title: "Error",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       })
     },
     onSliceSelect(data) {

@@ -46,8 +46,19 @@ export default {
       };
       axios.post("http://localhost:8000/login", request_data, request_config).then((resp)=>{
         vm.isLoggedIn = true;
+        vm.$bvToast.toast("Login succeeded", {
+          title: "Info",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "info"
+        })
       }, (err)=>{
-        console.log(err)
+        vm.$bvToast.toast("Login failed", {
+          title: "Error",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       })
     },
     onSignOut(){
@@ -56,6 +67,19 @@ export default {
       axios.get("http://localhost:8000/logout").then((resp)=>{
         vm.isLoggedIn = false;
         this.$router.push("/");
+        vm.$bvToast.toast("Logout succeeded", {
+          title: "Info",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "info"
+        })
+      }, (err)=>{
+        vm.$bvToast.toast("Logout failed", {
+          title: "Danger",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       });
     },
     attachSignin(element) {
