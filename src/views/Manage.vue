@@ -36,6 +36,7 @@ export default {
   },
   methods: {
     load_recent_expenses(){
+      var vm = this;
       var now = new Date().toISOString();
       const request = {
         params: { "to_date": now.substring(0,10) },
@@ -44,7 +45,13 @@ export default {
       axios.get("http://localhost:8000/recent", request).then((resp)=>{
         this.expenses = resp.data
       }, (err)=>{
-        console.log(err)
+        vm.isLoading = false;
+        vm.$bvToast.toast("Failed to get recent data", {
+          title: "Error",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
       })
     }
   },

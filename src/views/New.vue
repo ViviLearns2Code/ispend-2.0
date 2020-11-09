@@ -9,7 +9,7 @@
             v-model="form.title"
             type="text"
             required
-            maxlength=10
+            maxlength=20
             placeholder="expense title"
           ></b-form-input>
         </b-form-group>
