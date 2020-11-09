@@ -54,6 +54,7 @@ import BarChart from '@/components/BarChart.vue';
 import PieChart from '@/components/PieChart.vue';
 import TimeSeries from '@/components/TimeSeries.vue';
 import axios from "axios";
+import moment from "moment"
 import * as mapper from '../assets/js/DataMapper.js';
 import { BContainer, BRow, BCol } from 'bootstrap-vue';
 
@@ -129,7 +130,7 @@ export default {
       vm.$router.push("#drilldown").catch(err => {})
       const request_monthstats = {
         params: {
-          "to_date": data.toISOString().substring(0,10),
+          "to_date": moment(data).endOf("month").toISOString().substring(0,10),
           "top": 3
         },
         withCredentials: true
@@ -137,6 +138,7 @@ export default {
       axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
         vm.pieChartData = mapper.conv2Pie(resp.data);
         vm.$refs.piechart.clear();
+        vm.$refs.barchart.clear();
         vm.$refs.piechart.createPieChart(vm.pieChartData);
         vm.isLoading = false;
       }, (err)=>{

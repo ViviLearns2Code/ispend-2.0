@@ -9,6 +9,7 @@
             v-model="form.title"
             type="text"
             required
+            maxlength=10
             placeholder="expense title"
           ></b-form-input>
         </b-form-group>
@@ -33,6 +34,10 @@
             id="sum-input"
             v-model="form.sum"
             required
+            type="number"
+            step="0.01"
+            min="1.00"
+            max="9999.99"
             placeholder="0.00"
           ></b-form-input>
         </b-form-group>
@@ -73,7 +78,6 @@ export default {
       vm.isLoading = true;
       evt.preventDefault()
       var request_body = { ...this.form }
-      request_body["sum"] = parseFloat(request_body["sum"])
       const request_config = {
         withCredentials: true
       };

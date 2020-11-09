@@ -91,6 +91,15 @@ export default {
   },
   mounted() {
     var vm = this;
+    const request_ping = {
+      withCredentials: true
+    };
+    axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
+      vm.isLoggedIn = true
+    }, (err)=>{
+      vm.isLoggedIn = false
+    })
+
     window.gapi.load("auth2", () => {
       /* Ready. Make a call to gapi.auth2.init or some other API */
       const _auth2 = window.gapi.auth2.init({
