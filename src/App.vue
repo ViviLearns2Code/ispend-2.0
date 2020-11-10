@@ -27,16 +27,10 @@ export default {
     "b-navbar": BNavbar,
     "b-button": BButton
   },
-  /*data(){
-    return {
-      isLoggedIn: false
-    }
-  },*/
   methods: {
     onSignIn(googleUser){
       const id_token = googleUser.getAuthResponse().id_token;
       var vm = this
-      console.debug(id_token)
       //send id_token to backend API for verification
       const request_data = {
         "google_id_token": id_token
@@ -83,10 +77,16 @@ export default {
       });
     },
     attachSignin(element) {
+      var vm = this;
       const auth2 = window.gapi.auth2.getAuthInstance();
       auth2.attachClickHandler(element, {}, this.onSignIn, (error)=>{
-            console.error(JSON.stringify(error, undefined, 2));
-          });
+        vm.$bvToast.toast(JSON.stringify(error, undefined, 2), {
+          title: "Danger",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "danger"
+        })
+      });
     }
   },
   mounted() {
