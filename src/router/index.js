@@ -52,15 +52,24 @@ router.beforeEach((to, from, next) => {
   const request_ping = {
     withCredentials: true
   };
-  if (to.name == "Home"){
-    next();
-  } else {
-    axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
-      next()
-    }, (err)=>{
-      next(false)
-    })
-  }
+  axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
+    next()
+  }, (err)=>{
+    if (to.name == "Home"){
+      next();
+      router.app.$data.isLoggedIn = false;
+    } else {
+      next(false);
+      router.app.$data.isLoggedIn = false;
+      router.app.$bvToast.toast("Session expired, please login again", {
+        title: "Warning",
+        autoHideDelay: 5000,
+        appendToast: true,
+        variant: "warning"
+      })
+      router.push("/")
+    }
+  })
 })
 
 export default router

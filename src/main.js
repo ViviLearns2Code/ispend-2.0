@@ -12,5 +12,8 @@ Vue.use(IconsPlugin)
 
 new Vue({
   router,
+  data: {
+    isLoggedIn: false
+  },
   render: h => h(App)
 }).$mount('#app')

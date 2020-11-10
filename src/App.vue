@@ -3,14 +3,14 @@
   <b-navbar toggleable="lg" type="dark" variant="info">
     <b-navbar-nav>
       <b-nav-item to="/">Home</b-nav-item>
-      <b-nav-item :disabled="!isLoggedIn" to="/manage">Manage</b-nav-item>
-      <b-nav-item :disabled="!isLoggedIn" to="/new">New</b-nav-item>
-      <b-nav-item :disabled="!isLoggedIn" to="/dashboard">Dashboard</b-nav-item>
+      <b-nav-item :disabled="!this.$root.isLoggedIn" to="/manage">Manage</b-nav-item>
+      <b-nav-item :disabled="!this.$root.isLoggedIn" to="/new">New</b-nav-item>
+      <b-nav-item :disabled="!this.$root.isLoggedIn" to="/dashboard">Dashboard</b-nav-item>
     </b-navbar-nav>
     <!-- Right aligned nav items -->
     <b-navbar-nav class="ml-auto">
-      <b-button ref="login-btn" v-show="!isLoggedIn" variant="success">Login</b-button>
-      <b-button ref="logout-btn" v-show="isLoggedIn" variant="danger" v-on:click="onSignOut">Logout</b-button>
+      <b-button ref="login-btn" v-show="!this.$root.isLoggedIn" variant="success">Login</b-button>
+      <b-button ref="logout-btn" v-show="this.$root.isLoggedIn" variant="danger" v-on:click="onSignOut">Logout</b-button>
     </b-navbar-nav>
   </b-navbar>
   <router-view></router-view>
@@ -27,11 +27,11 @@ export default {
     "b-navbar": BNavbar,
     "b-button": BButton
   },
-  data(){
+  /*data(){
     return {
       isLoggedIn: false
     }
-  },
+  },*/
   methods: {
     onSignIn(googleUser){
       const id_token = googleUser.getAuthResponse().id_token;
@@ -45,7 +45,7 @@ export default {
         withCredentials: true
       };
       axios.post("http://localhost:8000/login", request_data, request_config).then((resp)=>{
-        vm.isLoggedIn = true;
+        vm.$root.isLoggedIn = true;
         vm.$bvToast.toast("Login succeeded", {
           title: "Info",
           autoHideDelay: 5000,
@@ -65,7 +65,7 @@ export default {
       var vm = this
       //const auth2 = window.gapi.auth2.getAuthInstance()
       axios.get("http://localhost:8000/logout").then((resp)=>{
-        vm.isLoggedIn = false;
+        vm.i$root.sLoggedIn = false;
         this.$router.push("/");
         vm.$bvToast.toast("Logout succeeded", {
           title: "Info",
@@ -95,9 +95,9 @@ export default {
       withCredentials: true
     };
     axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
-      vm.isLoggedIn = true
+      vm.$root.isLoggedIn = true
     }, (err)=>{
-      vm.isLoggedIn = false
+      vm.$root.isLoggedIn = false
     })
 
     window.gapi.load("auth2", () => {
