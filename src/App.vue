@@ -57,7 +57,10 @@ export default {
     },
     onSignOut(){
       var vm = this;
-      axios.get("http://localhost:8000/logout").then((resp)=>{
+      const request_config = {
+        withCredentials: true
+      };
+      axios.get("http://localhost:8000/logout", request_config).then((resp)=>{
         vm.$root.isLoggedIn = false;
         this.$router.push("/").catch((err)=>{});
         vm.$bvToast.toast("Logout succeeded", {

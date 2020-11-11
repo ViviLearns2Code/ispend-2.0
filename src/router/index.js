@@ -53,11 +53,12 @@ router.beforeEach((to, from, next) => {
     withCredentials: true
   };
   axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
-    next()
+    router.app.$data.isLoggedIn = true;
+    next();
   }, (err)=>{
     if (to.name == "Home"){
-      next();
       router.app.$data.isLoggedIn = false;
+      next();
     } else {
       next(false);
       router.app.$data.isLoggedIn = false;
