@@ -56,11 +56,10 @@ export default {
       })
     },
     onSignOut(){
-      var vm = this
-      //const auth2 = window.gapi.auth2.getAuthInstance()
+      var vm = this;
       axios.get("http://localhost:8000/logout").then((resp)=>{
-        vm.i$root.sLoggedIn = false;
-        this.$router.push("/");
+        vm.$root.isLoggedIn = false;
+        this.$router.push("/").catch((err)=>{});
         vm.$bvToast.toast("Logout succeeded", {
           title: "Info",
           autoHideDelay: 5000,
@@ -91,15 +90,6 @@ export default {
   },
   mounted() {
     var vm = this;
-    const request_ping = {
-      withCredentials: true
-    };
-    axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
-      vm.$root.isLoggedIn = true
-    }, (err)=>{
-      vm.$root.isLoggedIn = false
-    })
-
     window.gapi.load("auth2", () => {
       /* Ready. Make a call to gapi.auth2.init or some other API */
       const _auth2 = window.gapi.auth2.init({

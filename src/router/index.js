@@ -67,7 +67,7 @@ router.beforeEach((to, from, next) => {
         appendToast: true,
         variant: "warning"
       })
-      router.push("/")
+      router.push("/").catch((err)=>{})
     }
   })
 })
