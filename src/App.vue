@@ -20,7 +20,8 @@
 <script>
 import { BNavbar } from 'bootstrap-vue';
 import { BButton } from 'bootstrap-vue';
-import axios from "axios";
+import * as request_handler from './assets/js/RequestHandler.js';
+
 
 export default {
   components: {
@@ -31,34 +32,51 @@ export default {
     onSignIn(googleUser){
       const id_token = googleUser.getAuthResponse().id_token;
       var vm = this
-      //send id_token to backend API for verification
-      const request_data = {
-        "google_id_token": id_token
-      };
-      const request_config = {
-        withCredentials: true
-      };
-      axios.post("http://localhost:8000/login", request_data, request_config).then((resp)=>{
+      var success_fn = function(resp){
         vm.$root.isLoggedIn = true;
         vm.$bvToast.toast("Login succeeded", {
-          title: "Info",
+          title: "Success",
           autoHideDelay: 5000,
           appendToast: true,
-          variant: "info"
+          variant: "success"
         })
-      }, (err)=>{
-        vm.$bvToast.toast("Login failed", {
-          title: "Error",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      })
+      };
+      //send id_token to backend API for verification
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/login",
+          method: "post",
+          data: {"google_id_token": id_token}
+        },
+        vm,
+        success_fn,
+        (err)=>{return;}
+      );
     },
     onSignOut(){
       var vm = this;
-      const request_config = {
-        withCredentials: true
+      var success_fn = function(resp){
+        vm.$root.isLoggedIn = false;
+        vm.$bvToast.toast("Logout succeeded", {
+          title: "Success",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "success"
+        })
+        vm.$router.push("/").catch((err)=>{});
+      };
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/logout",
+          method: "get"
+        },
+        vm,
+        success_fn,
+        (err)=>{return;}
+      );
+      /*const request_config = {
+        withCredentials: true,
+        validateStatus: () => true
       };
       axios.get("http://localhost:8000/logout", request_config).then((resp)=>{
         vm.$root.isLoggedIn = false;
@@ -76,7 +94,7 @@ export default {
           appendToast: true,
           variant: "danger"
         })
-      });
+      });*/
     },
     attachSignin(element) {
       var vm = this;

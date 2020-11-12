@@ -51,7 +51,8 @@
 
 <script>
 import { BForm, BFormDatepicker, BOverlay } from 'bootstrap-vue';
-import axios from "axios";
+import * as request_handler from '../assets/js/RequestHandler.js';
+
 export default {
   title: "Manage",
   components: {
@@ -75,29 +76,31 @@ export default {
   methods: {
     onSubmit(evt) {
       var vm = this;
+      var success_fn = function(resp){
+        vm.isLoading = false;
+        vm.$bvToast.toast("Successfully created new expense", {
+          title: "Success",
+          autoHideDelay: 5000,
+          appendToast: true,
+          variant: "success"
+        })
+      };
+      var cleanup_fn = function(){
+        vm.isLoading = false;
+      };
       vm.isLoading = true;
       evt.preventDefault()
       var request_body = { ...this.form }
-      const request_config = {
-        withCredentials: true
-      };
-      axios.post("http://localhost:8000/add", request_body, request_config).then((resp)=>{
-        vm.isLoading = false;
-        vm.$bvToast.toast("Successfully created new expense", {
-          title: "Info",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "info"
-        })
-      }, (err)=>{
-        vm.isLoading = false;
-        vm.$bvToast.toast("Failed to create new expense", {
-          title: "Error",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      })
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/add",
+          method: "post",
+          data: request_body
+        },
+        vm,
+        success_fn,
+        cleanup_fn
+      );
     },
     onReset(evt) {
       evt.preventDefault()

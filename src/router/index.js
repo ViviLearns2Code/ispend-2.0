@@ -4,7 +4,7 @@ import Home from '../views/Home.vue'
 import Manage from '../views/Manage.vue'
 import New from '../views/New.vue'
 import Dashboard from '../views/Dashboard.vue'
-import axios from "axios";
+import * as request_handler from '../assets/js/RequestHandler.js';
 
 
 Vue.use(VueRouter)
@@ -49,28 +49,29 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const request_ping = {
-    withCredentials: true
-  };
-  axios.get("http://localhost:8000/ping", request_ping).then((resp)=>{
+  var success_fn = function(vm, resp){
     router.app.$data.isLoggedIn = true;
-    next();
-  }, (err)=>{
+    next()
+  };
+  var cleanup_fn = function(vm){
     if (to.name == "Home"){
       router.app.$data.isLoggedIn = false;
       next();
     } else {
       next(false);
       router.app.$data.isLoggedIn = false;
-      router.app.$bvToast.toast("Session expired, please login again", {
-        title: "Warning",
-        autoHideDelay: 5000,
-        appendToast: true,
-        variant: "warning"
-      })
       router.push("/").catch((err)=>{})
     }
-  })
+  };
+  request_handler.send_request(
+    {
+      url: "http://localhost:8000/ping",
+      method: "get"
+    },
+    router.app,
+    success_fn,
+    cleanup_fn
+  );
 })
 
 export default router

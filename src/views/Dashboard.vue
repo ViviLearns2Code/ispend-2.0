@@ -53,7 +53,7 @@
 import BarChart from '@/components/BarChart.vue';
 import PieChart from '@/components/PieChart.vue';
 import TimeSeries from '@/components/TimeSeries.vue';
-import axios from "axios";
+import * as request_handler from '../assets/js/RequestHandler.js';
 import moment from "moment"
 import * as mapper from '../assets/js/DataMapper.js';
 import { BContainer, BRow, BCol } from 'bootstrap-vue';
@@ -82,19 +82,62 @@ export default {
       var vm = this;
       vm.isLoading = true;
       var now = new Date().toISOString();
-      const request_hist = {
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/history",
+          method: "get",
+          params: {
+            "to_date": now.substring(0,10),
+            "months": 6
+          }
+        },
+        vm,
+        (resp)=>{
+          vm.timeseriesData = mapper.conv2Lines(resp.data);
+          vm.$refs.timeseries.clear();
+          vm.$refs.timeseries.createTimeseriesChart(vm.timeseriesData);
+          vm.isLoading = false
+        },
+        ()=>{
+          vm.timeseriesData = [];
+          vm.isLoading = false;
+        }
+      );
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/monthstats",
+          method: "get",
+          params: {
+            "to_date": now.substring(0,10),
+            "top": 3
+          }
+        },
+        vm,
+        (resp)=>{
+          vm.pieChartData = mapper.conv2Pie(resp.data);
+          vm.$refs.piechart.createPieChart(vm.pieChartData);
+          vm.isLoading = false;
+        },
+        ()=>{
+          vm.pieChartData = [];
+          vm.isLoading = false;
+        }
+      );
+      /*const request_hist = {
         params: {
           "to_date": now.substring(0,10),
           "months": 6
         },
-        withCredentials: true
+        withCredentials: true,
+        validateStatus: () => true
       };
       const request_monthstats = {
         params: {
           "to_date": now.substring(0,10),
           "top": 3
         },
-        withCredentials: true
+        withCredentials: true,
+        validateStatus: () => true
       };
       axios.get("http://localhost:8000/history", request_hist).then((resp)=>{
         vm.timeseriesData = mapper.conv2Lines(resp.data);
@@ -122,18 +165,43 @@ export default {
           appendToast: true,
           variant: "danger"
         })
-      })
+      })*/
     },
     onMonthSelect(data) {
       var vm = this;
       vm.isLoading = true;
       vm.$router.push("#drilldown").catch(err => {})
-      const request_monthstats = {
+      request_handler.send_request(
+        {
+          url: "http://localhost:8000/monthstats",
+          method: "get",
+          params: {
+            "to_date": moment(data).endOf("month").toISOString().substring(0,10),
+            "top": 3
+          }
+        },
+        vm,
+        (resp)=>{
+          vm.pieChartData = mapper.conv2Pie(resp.data);
+          vm.$refs.piechart.clear();
+          vm.$refs.barchart.clear();
+          vm.$refs.piechart.createPieChart(vm.pieChartData);
+          vm.isLoading = false;
+        },
+        ()=>{
+          vm.pieChartData = [];
+          vm.barChartData = []
+          vm.isLoading = false;
+        }
+      );
+
+      /*const request_monthstats = {
         params: {
           "to_date": moment(data).endOf("month").toISOString().substring(0,10),
           "top": 3
         },
-        withCredentials: true
+        withCredentials: true,
+        validateStatus: () => true
       };
       axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
         vm.pieChartData = mapper.conv2Pie(resp.data);
@@ -149,7 +217,7 @@ export default {
           appendToast: true,
           variant: "danger"
         })
-      })
+      })*/
     },
     onSliceSelect(data) {
       var vm = this;
