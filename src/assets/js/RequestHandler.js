@@ -12,12 +12,12 @@ export function send_request(request, vm, success_fn, cleanup_fn){
     }
     else if (resp.status == "401"){
       cleanup_fn()
-      vm.$bvToast.toast("Please log in", {
-        title: "Warning",
+      vm.$bvToast.toast("Not logged in", {
+        title: "Info",
         //noAutoHide: true,
         autoHideDelay: 5000,
         appendToast: true,
-        variant: "warning"
+        variant: "info"
       })
     }
   }, (err)=>{

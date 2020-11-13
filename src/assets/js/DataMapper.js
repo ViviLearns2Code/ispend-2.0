@@ -1,15 +1,11 @@
 import moment from "moment"
 
 
-export function conv2Lines(data){
-  // local time trimmmed to 00:00
-  let currDate = new Date();
-  let currDateISO = new Date(currDate.getFullYear(), currDate.getMonth(), currDate.getDate(), 0, 0, 0, 0).toISOString();
-
+export function conv2Lines(data, now){
   return data.map((c)=>{
     return {
         text: c.categoryname, // line name
-        data: this.fillDates(c.history, currDateISO)
+        data: this.fillDates(c.history, now)
     }
   });
 }

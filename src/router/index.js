@@ -54,7 +54,7 @@ router.beforeEach((to, from, next) => {
     next()
   };
   var cleanup_fn = function(vm){
-    if (to.name == "Home"){
+    if (to.name == "Home" & from.name != "Home" & from.name != ""){
       router.app.$data.isLoggedIn = false;
       next();
     } else {

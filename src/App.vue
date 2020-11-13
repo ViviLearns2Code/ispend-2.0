@@ -74,27 +74,6 @@ export default {
         success_fn,
         (err)=>{return;}
       );
-      /*const request_config = {
-        withCredentials: true,
-        validateStatus: () => true
-      };
-      axios.get("http://localhost:8000/logout", request_config).then((resp)=>{
-        vm.$root.isLoggedIn = false;
-        this.$router.push("/").catch((err)=>{});
-        vm.$bvToast.toast("Logout succeeded", {
-          title: "Info",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "info"
-        })
-      }, (err)=>{
-        vm.$bvToast.toast("Logout failed", {
-          title: "Danger",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      });*/
     },
     attachSignin(element) {
       var vm = this;

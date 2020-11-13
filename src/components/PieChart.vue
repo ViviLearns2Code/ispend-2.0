@@ -25,7 +25,7 @@ export default {
   },
   data: function (){
     return {
-      placeholder: "No data available"
+      placeholder: "No data"
     }
   },
   mounted(){

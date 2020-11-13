@@ -81,19 +81,19 @@ export default {
     load_history(){
       var vm = this;
       vm.isLoading = true;
-      var now = new Date().toISOString();
+      var now = new Date().toISOString().substring(0,10);
       request_handler.send_request(
         {
           url: "http://localhost:8000/history",
           method: "get",
           params: {
-            "to_date": now.substring(0,10),
+            "to_date": now,
             "months": 6
           }
         },
         vm,
         (resp)=>{
-          vm.timeseriesData = mapper.conv2Lines(resp.data);
+          vm.timeseriesData = mapper.conv2Lines(resp.data, now);
           vm.$refs.timeseries.clear();
           vm.$refs.timeseries.createTimeseriesChart(vm.timeseriesData);
           vm.isLoading = false
@@ -103,69 +103,6 @@ export default {
           vm.isLoading = false;
         }
       );
-      request_handler.send_request(
-        {
-          url: "http://localhost:8000/monthstats",
-          method: "get",
-          params: {
-            "to_date": now.substring(0,10),
-            "top": 3
-          }
-        },
-        vm,
-        (resp)=>{
-          vm.pieChartData = mapper.conv2Pie(resp.data);
-          vm.$refs.piechart.createPieChart(vm.pieChartData);
-          vm.isLoading = false;
-        },
-        ()=>{
-          vm.pieChartData = [];
-          vm.isLoading = false;
-        }
-      );
-      /*const request_hist = {
-        params: {
-          "to_date": now.substring(0,10),
-          "months": 6
-        },
-        withCredentials: true,
-        validateStatus: () => true
-      };
-      const request_monthstats = {
-        params: {
-          "to_date": now.substring(0,10),
-          "top": 3
-        },
-        withCredentials: true,
-        validateStatus: () => true
-      };
-      axios.get("http://localhost:8000/history", request_hist).then((resp)=>{
-        vm.timeseriesData = mapper.conv2Lines(resp.data);
-        vm.$refs.timeseries.clear();
-        vm.$refs.timeseries.createTimeseriesChart(vm.timeseriesData);
-        vm.isLoading = false
-      }, (err)=>{
-        vm.isLoading = false;
-        vm.$bvToast.toast("Failed to retrieve data", {
-          title: "Error",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      })
-      axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
-        vm.pieChartData = mapper.conv2Pie(resp.data);
-        vm.$refs.piechart.createPieChart(vm.pieChartData);
-        vm.isLoading = false;
-      }, (err)=>{
-        vm.isLoading = false;
-        vm.$bvToast.toast("Failed to retrieve data", {
-          title: "Error",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      })*/
     },
     onMonthSelect(data) {
       var vm = this;
@@ -184,43 +121,23 @@ export default {
         (resp)=>{
           vm.pieChartData = mapper.conv2Pie(resp.data);
           vm.$refs.piechart.clear();
-          vm.$refs.barchart.clear();
           vm.$refs.piechart.createPieChart(vm.pieChartData);
+          vm.barChartData = []
+          vm.$refs.barchart.clear();
           vm.isLoading = false;
         },
         ()=>{
           vm.pieChartData = [];
           vm.barChartData = []
+          vm.$refs.piechart.clear();
+          vm.$refs.barchart.clear();
           vm.isLoading = false;
         }
       );
-
-      /*const request_monthstats = {
-        params: {
-          "to_date": moment(data).endOf("month").toISOString().substring(0,10),
-          "top": 3
-        },
-        withCredentials: true,
-        validateStatus: () => true
-      };
-      axios.get("http://localhost:8000/monthstats", request_monthstats).then((resp)=>{
-        vm.pieChartData = mapper.conv2Pie(resp.data);
-        vm.$refs.piechart.clear();
-        vm.$refs.barchart.clear();
-        vm.$refs.piechart.createPieChart(vm.pieChartData);
-        vm.isLoading = false;
-      }, (err)=>{
-        vm.isLoading = false;
-        vm.$bvToast.toast("Failed to retrieve data", {
-          title: "Error",
-          autoHideDelay: 5000,
-          appendToast: true,
-          variant: "danger"
-        })
-      })*/
     },
     onSliceSelect(data) {
       var vm = this;
+      debugger;
       vm.barChartData = mapper.conv2Bar(data)
       vm.$refs.barchart.clear();
       vm.$refs.barchart.createBarchart(vm.barChartData);
